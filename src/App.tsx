@@ -2,7 +2,7 @@ import { GameFrame } from "./components/GameFrame";
 import { GameProvider } from "./contexts/Game";
 
 const App = () => (
-  <GameProvider>
+  <GameProvider onUpdate={console.log}>
     <GameFrame />
   </GameProvider>
 );
