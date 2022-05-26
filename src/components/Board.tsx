@@ -16,7 +16,7 @@ const Board: FC<IBoardProps> = ({ readonly }) => {
       {Array(3)
         .fill(null)
         .map((_value, rowIndex) => (
-          <div className="board-row">
+          <div className="board-row" key={rowIndex}>
             {Array(3)
               .fill(null)
               .map((_value, columnIndex) => {
@@ -24,6 +24,7 @@ const Board: FC<IBoardProps> = ({ readonly }) => {
 
                 return (
                   <Square
+                    key={i}
                     value={squares[i]}
                     onClick={() => !readonly && handleSquareClick(i)}
                   />
