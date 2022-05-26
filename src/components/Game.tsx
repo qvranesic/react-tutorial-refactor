@@ -1,54 +1,42 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { IBoardState } from "../interfaces/IBoardState";
+import { calculateNextSquareValue } from "../utils/calculateNextSquareValue";
 import { calculateWinner } from "../utils/calculateWinner";
 import { Board } from "./Board";
 import { Moves } from "./Moves";
 
-type IGameState = {
-  history: IBoardState[];
-  stepNumber: number;
-  xIsNext: boolean;
-};
-
 const Game: FC = () => {
-  const [{ history, stepNumber, xIsNext }, setState] = useState<IGameState>({
-    history: [
-      {
-        squares: Array(9).fill(null),
-      },
-    ],
-    stepNumber: 0,
-    xIsNext: true,
-  });
+  const [history, setHistory] = useState<IBoardState[]>([
+    {
+      squares: Array(9).fill(null),
+    },
+  ]);
 
-  const handleClick = (i: number) => {
+  const [stepNumber, setStepNumber] = useState(0);
+
+  useEffect(() => {
+    setStepNumber(history.length - 1);
+  }, [history]);
+
+  const handleSquareClick = (i: number) => {
     const newHistory = history.slice(0, stepNumber + 1);
     const current = newHistory[newHistory.length - 1];
-    const squares = current.squares.slice();
 
-    if (calculateWinner(squares) || squares[i]) {
+    if (calculateWinner(current.squares) || current.squares[i]) {
       return;
     }
 
-    squares[i] = xIsNext ? "X" : "O";
+    const newSquares = current.squares.slice();
 
-    setState({
-      history: newHistory.concat([
+    newSquares[i] = calculateNextSquareValue("X", stepNumber);
+
+    setHistory(
+      newHistory.concat([
         {
-          squares: squares,
+          squares: newSquares,
         },
-      ]),
-      stepNumber: newHistory.length,
-      xIsNext: !xIsNext,
-    });
-  };
-
-  const jumpTo = (stepNumber: number) => {
-    setState(({ history }) => ({
-      history,
-      stepNumber: stepNumber,
-      xIsNext: stepNumber % 2 === 0,
-    }));
+      ])
+    );
   };
 
   const { squares } = history[stepNumber];
@@ -56,16 +44,16 @@ const Game: FC = () => {
 
   const status = winner
     ? "Winner: " + winner
-    : "Next player: " + (xIsNext ? "X" : "O");
+    : "Next player: " + calculateNextSquareValue("X", stepNumber);
 
   return (
     <div className="game">
       <div className="game-board">
-        <Board squares={squares} onSquareClick={handleClick} />
+        <Board squares={squares} onSquareClick={handleSquareClick} />
       </div>
       <div className="game-info">
         <div>{status}</div>
-        <Moves history={history} onStepClick={jumpTo} />
+        <Moves history={history} onStepClick={setStepNumber} />
       </div>
     </div>
   );
