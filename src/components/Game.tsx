@@ -4,6 +4,7 @@ import { calculateNextSquareValue } from "../utils/calculateNextSquareValue";
 import { calculateWinner } from "../utils/calculateWinner";
 import { Board } from "./Board";
 import { Moves } from "./Moves";
+import { Status } from "./Status";
 
 const Game: FC = () => {
   const [history, setHistory] = useState<IBoardState[]>([
@@ -40,11 +41,6 @@ const Game: FC = () => {
   };
 
   const { squares } = history[stepNumber];
-  const winner = calculateWinner(squares);
-
-  const status = winner
-    ? "Winner: " + winner
-    : "Next player: " + calculateNextSquareValue("X", stepNumber);
 
   return (
     <div className="game">
@@ -52,7 +48,7 @@ const Game: FC = () => {
         <Board squares={squares} onSquareClick={handleSquareClick} />
       </div>
       <div className="game-info">
-        <div>{status}</div>
+        <Status squares={squares} stepNumber={stepNumber} />
         <Moves history={history} onStepClick={setStepNumber} />
       </div>
     </div>
