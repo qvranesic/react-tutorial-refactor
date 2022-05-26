@@ -21,20 +21,22 @@ type IGameContext = {
 const GameContext = createContext<IGameContext>({} as any);
 
 type IGameProviderProps = {
-  firstSquareValue: NonNullable<ISquareValue>;
+  firstSquareValue?: NonNullable<ISquareValue>;
+  initialHistory?: IBoardState[];
 };
 
 const GameProvider: FC<PropsWithChildren<IGameProviderProps>> = ({
   children,
-  firstSquareValue,
-}) => {
-  const [history, setHistory] = useState<IBoardState[]>([
+  firstSquareValue = "X",
+  initialHistory = [
     {
       squares: Array(9).fill(null),
     },
-  ]);
+  ],
+}) => {
+  const [history, setHistory] = useState<IBoardState[]>(initialHistory);
 
-  const [stepNumber, setStepNumber] = useState(0);
+  const [stepNumber, setStepNumber] = useState(initialHistory.length - 1);
 
   useEffect(() => {
     setStepNumber(history.length - 1);
