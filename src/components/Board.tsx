@@ -1,8 +1,12 @@
-import { useContext } from "react";
+import { FC, useContext } from "react";
 import { GameContext } from "../contexts/Game";
 import { Square } from "./Square";
 
-const Board = () => {
+type IBoardProps = {
+  readonly?: boolean;
+};
+
+const Board: FC<IBoardProps> = ({ readonly }) => {
   const { history, stepNumber, handleSquareClick } = useContext(GameContext);
 
   const { squares } = history[stepNumber];
@@ -21,7 +25,7 @@ const Board = () => {
                 return (
                   <Square
                     value={squares[i]}
-                    onClick={() => handleSquareClick(i)}
+                    onClick={() => !readonly && handleSquareClick(i)}
                   />
                 );
               })}
