@@ -1,11 +1,8 @@
 import { FC, useState } from "react";
-import { ISquareValue } from "../interfaces/ISquareValue";
+import { IBoardState } from "../interfaces/IBoardState";
 import { calculateWinner } from "../utils/calculateWinner";
 import { Board } from "./Board";
-
-type IBoardState = {
-  squares: ISquareValue[];
-};
+import { Moves } from "./Moves";
 
 type IGameState = {
   history: IBoardState[];
@@ -36,12 +33,12 @@ const Game: FC = () => {
     squares[i] = xIsNext ? "X" : "O";
 
     setState({
-      history: history.concat([
+      history: newHistory.concat([
         {
           squares: squares,
         },
       ]),
-      stepNumber: history.length,
+      stepNumber: newHistory.length,
       xIsNext: !xIsNext,
     });
   };
@@ -57,15 +54,6 @@ const Game: FC = () => {
   const { squares } = history[stepNumber];
   const winner = calculateWinner(squares);
 
-  const moves = history.map((step, move) => {
-    const desc = move ? "Go to move #" + move : "Go to game start";
-    return (
-      <li key={move}>
-        <button onClick={() => jumpTo(move)}>{desc}</button>
-      </li>
-    );
-  });
-
   const status = winner
     ? "Winner: " + winner
     : "Next player: " + (xIsNext ? "X" : "O");
@@ -77,7 +65,7 @@ const Game: FC = () => {
       </div>
       <div className="game-info">
         <div>{status}</div>
-        <ol>{moves}</ol>
+        <Moves history={history} onStepClick={jumpTo} />
       </div>
     </div>
   );
