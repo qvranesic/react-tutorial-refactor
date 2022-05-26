@@ -23,6 +23,7 @@ const GameContext = createContext<IGameContext>({} as any);
 type IGameProviderProps = {
   firstSquareValue?: NonNullable<ISquareValue>;
   initialHistory?: IBoardState[];
+  onUpdate?: (state: Pick<IGameContext, "history" | "stepNumber">) => void;
 };
 
 const GameProvider: FC<PropsWithChildren<IGameProviderProps>> = ({
@@ -33,6 +34,7 @@ const GameProvider: FC<PropsWithChildren<IGameProviderProps>> = ({
       squares: Array(9).fill(null),
     },
   ],
+  onUpdate,
 }) => {
   const [history, setHistory] = useState<IBoardState[]>(initialHistory);
 
@@ -41,6 +43,10 @@ const GameProvider: FC<PropsWithChildren<IGameProviderProps>> = ({
   useEffect(() => {
     setStepNumber(history.length - 1);
   }, [history]);
+
+  useEffect(() => {
+    onUpdate && onUpdate({ history, stepNumber });
+  }, [stepNumber]);
 
   const handleSquareClick = (i: number) => {
     const newHistory = history.slice(0, stepNumber + 1);
