@@ -1,14 +1,13 @@
-import { FC } from "react";
-import { ISquareValue } from "../interfaces/ISquareValue";
+import { useContext } from "react";
+import { GameContext } from "../contexts/Game";
 import { calculateNextSquareValue } from "../utils/calculateNextSquareValue";
 import { calculateWinner } from "../utils/calculateWinner";
 
-type IStatusProps = {
-  squares: ISquareValue[];
-  stepNumber: number;
-};
+const Status = () => {
+  const { history, stepNumber } = useContext(GameContext);
 
-const Status: FC<IStatusProps> = ({ squares, stepNumber }) => {
+  const { squares } = history[stepNumber];
+
   const winner = calculateWinner(squares);
 
   const status = winner

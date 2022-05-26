@@ -1,18 +1,15 @@
-import { FC } from "react";
-import { IBoardState } from "../interfaces/IBoardState";
+import { useContext } from "react";
+import { GameContext } from "../contexts/Game";
 
-type IMovesProps = {
-  history: IBoardState[];
-  onStepClick: (i: number) => void;
-};
+const Moves = () => {
+  const { history, jumpTo } = useContext(GameContext);
 
-const Moves: FC<IMovesProps> = ({ history, onStepClick }) => {
-  const moves = history.map((step, move) => {
+  const moves = history.map((_boardState, move) => {
     const desc = move ? "Go to move #" + move : "Go to game start";
 
     return (
       <li key={move}>
-        <button onClick={() => onStepClick(move)}>{desc}</button>
+        <button onClick={() => jumpTo(move)}>{desc}</button>
       </li>
     );
   });

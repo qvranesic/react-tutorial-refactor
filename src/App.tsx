@@ -1,5 +1,10 @@
-import { Game } from "./components/Game";
+import { GameFrame } from "./components/GameFrame";
+import { GameProvider } from "./contexts/Game";
 
-const App = () => <Game />;
+const App = () => (
+  <GameProvider firstSquareValue="X">
+    <GameFrame />
+  </GameProvider>
+);
 
 export default App;

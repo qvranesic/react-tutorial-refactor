@@ -1,30 +1,34 @@
-import { FC } from "react";
-import { ISquareValue } from "../interfaces/ISquareValue";
+import { useContext } from "react";
+import { GameContext } from "../contexts/Game";
 import { Square } from "./Square";
 
-type IBoardProps = {
-  squares: ISquareValue[];
-  onSquareClick: (i: number) => void;
+const Board = () => {
+  const { history, stepNumber, handleSquareClick } = useContext(GameContext);
+
+  const { squares } = history[stepNumber];
+
+  return (
+    <div>
+      {Array(3)
+        .fill(null)
+        .map((_value, rowIndex) => (
+          <div className="board-row">
+            {Array(3)
+              .fill(null)
+              .map((_value, columnIndex) => {
+                const i = 3 * rowIndex + columnIndex;
+
+                return (
+                  <Square
+                    value={squares[i]}
+                    onClick={() => handleSquareClick(i)}
+                  />
+                );
+              })}
+          </div>
+        ))}
+    </div>
+  );
 };
-
-const Board: FC<IBoardProps> = ({ squares, onSquareClick }) => (
-  <div>
-    {Array(3)
-      .fill(null)
-      .map((_value, rowIndex) => (
-        <div className="board-row">
-          {Array(3)
-            .fill(null)
-            .map((_value, columnIndex) => {
-              const i = 3 * rowIndex + columnIndex;
-
-              return (
-                <Square value={squares[i]} onClick={() => onSquareClick(i)} />
-              );
-            })}
-        </div>
-      ))}
-  </div>
-);
 
 export { Board };
