@@ -4,11 +4,7 @@ import { calculateNextSquareValue } from "../utils/calculateNextSquareValue";
 import { calculateWinner } from "../utils/calculateWinner";
 
 const Status = () => {
-  const { history, stepNumber } = useContext(GameContext);
-
-  const { squares } = history[stepNumber];
-
-  const winner = calculateWinner(squares);
+  const { winner, stepNumber } = useContext(GameContext);
 
   const status = winner
     ? "Winner: " + winner

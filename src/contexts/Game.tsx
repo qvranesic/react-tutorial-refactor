@@ -3,6 +3,7 @@ import {
   FC,
   PropsWithChildren,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { IBoardState } from "../interfaces/IBoardState";
@@ -14,6 +15,7 @@ import { getRandomString } from "../utils/getRandomString";
 type IGameContext = {
   history: IBoardState[];
   stepNumber: number;
+  winner: ISquareValue;
   jumpTo: (move: number) => void;
   handleSquareClick: (index: number) => void;
 } & Pick<IGameProviderProps, "id" | "firstSquareValue">;
@@ -21,13 +23,13 @@ type IGameContext = {
 const GameContext = createContext<IGameContext>({} as any);
 
 type IGameProviderProps = {
-  id: string;
+  id?: string;
   firstSquareValue?: NonNullable<ISquareValue>;
   initialHistory?: IBoardState[];
   onUpdate?: (
     state: Pick<
       IGameContext,
-      "id" | "firstSquareValue" | "history" | "stepNumber"
+      "id" | "firstSquareValue" | "history" | "stepNumber" | "winner"
     >
   ) => void;
 };
@@ -48,6 +50,11 @@ const GameProvider: FC<PropsWithChildren<IGameProviderProps>> = ({
   const [history, setHistory] = useState<IBoardState[]>(initialHistory);
   const [stepNumber, setStepNumber] = useState(initialHistory.length - 1);
 
+  const winner = useMemo(() => {
+    const { squares } = history[stepNumber];
+    return calculateWinner(squares);
+  }, [stepNumber]);
+
   useEffect(() => {
     setStepNumber(history.length - 1);
   }, [history]);
@@ -59,6 +66,7 @@ const GameProvider: FC<PropsWithChildren<IGameProviderProps>> = ({
         firstSquareValue: frozenFirstSquareValue,
         history,
         stepNumber,
+        winner,
       });
   }, [stepNumber]);
 
@@ -66,7 +74,7 @@ const GameProvider: FC<PropsWithChildren<IGameProviderProps>> = ({
     const newHistory = history.slice(0, stepNumber + 1);
     const current = newHistory[newHistory.length - 1];
 
-    if (calculateWinner(current.squares) || current.squares[i]) {
+    if (winner || current.squares[i]) {
       return;
     }
 
@@ -92,6 +100,7 @@ const GameProvider: FC<PropsWithChildren<IGameProviderProps>> = ({
         id: frozenId,
         history,
         stepNumber,
+        winner,
         firstSquareValue: frozenFirstSquareValue,
         jumpTo: setStepNumber,
         handleSquareClick,
