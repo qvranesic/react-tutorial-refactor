@@ -1,4 +1,4 @@
-import React from "react";
+import { FC } from "react";
 import { ISquareValue } from "../interfaces/ISquareValue";
 
 type ISquareProps = {
@@ -6,14 +6,10 @@ type ISquareProps = {
   onClick: () => void;
 };
 
-class Square extends React.Component<ISquareProps> {
-  render() {
-    return (
-      <button className="square" onClick={() => this.props.onClick()}>
-        {this.props.value}
-      </button>
-    );
-  }
-}
+const Square: FC<ISquareProps> = ({ value, onClick }) => (
+  <button className="square" onClick={onClick}>
+    {value}
+  </button>
+);
 
 export { Square };
