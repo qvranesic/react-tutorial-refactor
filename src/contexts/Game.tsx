@@ -9,25 +9,32 @@ import { IBoardState } from "../interfaces/IBoardState";
 import { ISquareValue } from "../interfaces/ISquareValue";
 import { calculateNextSquareValue } from "../utils/calculateNextSquareValue";
 import { calculateWinner } from "../utils/calculateWinner";
+import { getRandomString } from "../utils/getRandomString";
 
 type IGameContext = {
   history: IBoardState[];
   stepNumber: number;
-  firstSquareValue: NonNullable<ISquareValue>;
   jumpTo: (move: number) => void;
   handleSquareClick: (index: number) => void;
-};
+} & Pick<IGameProviderProps, "id" | "firstSquareValue">;
 
 const GameContext = createContext<IGameContext>({} as any);
 
 type IGameProviderProps = {
+  id: string;
   firstSquareValue?: NonNullable<ISquareValue>;
   initialHistory?: IBoardState[];
-  onUpdate?: (state: Pick<IGameContext, "history" | "stepNumber">) => void;
+  onUpdate?: (
+    state: Pick<
+      IGameContext,
+      "id" | "firstSquareValue" | "history" | "stepNumber"
+    >
+  ) => void;
 };
 
 const GameProvider: FC<PropsWithChildren<IGameProviderProps>> = ({
   children,
+  id = getRandomString(),
   firstSquareValue = "X",
   initialHistory = [
     {
@@ -36,8 +43,9 @@ const GameProvider: FC<PropsWithChildren<IGameProviderProps>> = ({
   ],
   onUpdate,
 }) => {
+  const [frozenId] = useState(id);
+  const [frozenFirstSquareValue] = useState(firstSquareValue);
   const [history, setHistory] = useState<IBoardState[]>(initialHistory);
-
   const [stepNumber, setStepNumber] = useState(initialHistory.length - 1);
 
   useEffect(() => {
@@ -45,7 +53,13 @@ const GameProvider: FC<PropsWithChildren<IGameProviderProps>> = ({
   }, [history]);
 
   useEffect(() => {
-    onUpdate && onUpdate({ history, stepNumber });
+    onUpdate &&
+      onUpdate({
+        id: frozenId,
+        firstSquareValue: frozenFirstSquareValue,
+        history,
+        stepNumber,
+      });
   }, [stepNumber]);
 
   const handleSquareClick = (i: number) => {
@@ -58,7 +72,10 @@ const GameProvider: FC<PropsWithChildren<IGameProviderProps>> = ({
 
     const newSquares = current.squares.slice();
 
-    newSquares[i] = calculateNextSquareValue(firstSquareValue, stepNumber);
+    newSquares[i] = calculateNextSquareValue(
+      frozenFirstSquareValue,
+      stepNumber
+    );
 
     setHistory(
       newHistory.concat([
@@ -72,9 +89,10 @@ const GameProvider: FC<PropsWithChildren<IGameProviderProps>> = ({
   return (
     <GameContext.Provider
       value={{
+        id: frozenId,
         history,
         stepNumber,
-        firstSquareValue,
+        firstSquareValue: frozenFirstSquareValue,
         jumpTo: setStepNumber,
         handleSquareClick,
       }}
